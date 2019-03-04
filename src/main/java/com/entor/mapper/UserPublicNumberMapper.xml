@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserPublicNumber">
+
+	
+	<!-- parameterType:参数类型,resultType:返回值类型, #{id}代表一个站位符 -->
+	<select id="queryById" parameterType="int" resultType="UserPublicNumber">
+		 select * from wxms_user_public_number where id = #{id}
+	</select>
+	<insert id="add" parameterType="UserPublicNumber">
+		 insert into wxms_user_public_number(u_id,pid) values (#{u_id},#{pid})
+	</insert>
+	<insert id="addMore">
+		insert all  
+		<foreach collection="list" item="s">
+			into wxms_user_public_number(u_id,pid) values (#{s.u_id},#{s.pid}) 
+		</foreach>
+		select 1 from dual
+	</insert>
+	<update id="update" parameterType="UserPublicNumber">
+		update wxms_user_public_number set
+		u_id = #{u_id},
+		pid = #{pid}
+		where id = #{id}
+	</update>
+	<select id="queryAll" resultType="UserPublicNumber">
+		select * from wxms_user_public_number
+	</select>
+	<select id="queryByPage" parameterType="map" resultType="UserPublicNumber">
+		select * from 
+		(select rownum rn, t.* from 
+		(select * from wxms_user_public_number)t
+		) a
+		where a.rn>=#{start} and a.rn&lt;=#{pageSize}
+	</select>
+	<select id="queryByPageCondition" parameterType="map" resultType="UserPublicNumber">
+		select * from 
+		(select rownum rn, t.* from 
+		(select * from wxms_user_public_number)t
+		) a
+		where ${condition} and a.rn>=#{start} and a.rn&lt;=#{pageSize}
+	</select>
+	<select id="queryVO" parameterType="map" resultType="UserPublicNumberVO">
+		select * from 
+		(select rownum rn, t.* from 
+		(select w1.name,w2.publicId,w3.* from wxms_user w1,wxms_public_number w2,wxms_user_public_number w3
+		 where w1.id=w3.u_id and w2.id=w3.pid	
+		)t
+		) a
+		where ${condition} and a.rn>=#{start} and a.rn&lt;=#{pageSize}
+	</select>
+	<select id="queryVOAll" resultType="UserPublicNumberVO">
+		select * from 
+		(select t.* from 
+		(select w1.name,w2.publicId,w3.* from wxms_user w1,wxms_public_number w2,wxms_user_public_number w3
+		 where w1.id=w3.u_id and w2.id=w3.pid	
+		)t
+		) 
+	</select>
+	<select id="getTotals" resultType="int">
+		select count(*) from wxms_user_public_number
+	</select>
+	<select id="getTotalsCondition" resultType="int">
+		select count(*) from wxms_user_public_number #{condition}
+	</select>
+	<delete id="delete">
+		delete from wxms_user_public_number where id = #{id}
+	</delete>
+	<delete id="deleteMore">
+		delete from wxms_user_public_number where id in
+		<!-- collection:集合，separator:分隔符 -->
+		<foreach collection="array" open="(" close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</delete>
+	<delete id="deleteUserPublicNumByUid">
+		delete from wxms_user_public_number where u_id in
+		<!-- collection:集合，separator:分隔符 -->
+		<foreach collection="array" open="(" close=")" separator="," item="u_id">
+			#{u_id}
+		</foreach>
+	</delete>
+	
+	
+</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Template">
+
+	
+	<!-- parameterType:参数类型,resultType:返回值类型, #{id}代表一个站位符 -->
+	<select id="queryById" parameterType="int" resultType="Template">
+		 select * from wxms_template where id = #{id}
+	</select>
+	<insert id="add" parameterType="Template">
+		 insert into wxms_template(name,content,type,remark,u_id,createTime)
+		  values (#{name},#{content},#{type},#{remark},#{u_id},sysdate)
+	</insert>
+	<insert id="addMore">
+		insert all into 
+		<foreach collection="list" item="s">
+			wxms_template(name,content,type,remark,u_id,createTime) values 
+			(#{s.name},#{s.content},#{s.type},#{s.remark},#{s.u_id},sysdate) 
+		</foreach>
+		select 1 from dual
+	</insert>
+	<update id="update" parameterType="Template">
+		update wxms_template set
+		name = #{name},
+		content = #{content},
+		type = #{type},
+		remark = #{remark},
+		u_id = #{u_id},
+		createTime = sysdate
+		where id = #{id}
+	</update>
+	<select id="queryAll" resultType="Template">
+		select * from wxms_template
+	</select>
+	<select id="queryByPage" parameterType="map" resultType="Template">
+		select * from 
+		(select rownum rn, t.* from 
+		(select * from wxms_template)t
+		) a
+		where a.rn>=#{start} and a.rn&lt;=#{pageSize}
+	</select>
+	<select id="queryByPageCondition" parameterType="map" resultType="Template">
+		select * from 
+		(select rownum rn, t.* from 
+		(select * from wxms_template)t
+		) a
+		where ${condition} and a.rn>=#{start} and a.rn&lt;=#{pageSize}
+	</select>
+	<select id="getTotals" resultType="int">
+		select count(*) from wxms_template
+	</select>
+	<select id="getTotalsCondition" resultType="int">
+		select count(*) from wxms_template #{condition}
+	</select>
+	<delete id="delete">
+		delete from wxms_template where id = #{id}
+	</delete>
+	<delete id="deleteMore">
+		delete from wxms_template where id in
+		<!-- collection:集合，separator:分隔符 -->
+		<foreach collection="array" open="(" close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</delete>
+	
+	
+</mapper>

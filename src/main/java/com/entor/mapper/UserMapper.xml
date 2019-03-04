@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="User">
+	<sql id="fields">
+		id,username,password,name,sex,phone,address,email,photo,role,createTime
+	</sql>
+	
+	<!-- parameterType:参数类型,resultType:返回值类型, #{id}代表一个站位符 -->
+	<!-- *等同于jdbc中的get方法将值给对应的变量,#{id}通过set方法获得值 -->
+	<select id="queryById" parameterType="int" resultType="User">
+		 select * from wxms_user where id = #{id}
+	</select>
+	<insert id="add" parameterType="User">
+		 insert into wxms_user(username,password,name,sex,phone,address,email,photo,role,createTime) values (#{username},#{password},#{name},#{sex},#{phone},#{address},#{email},#{photo},#{role},sysdate)
+	</insert>
+	<insert id="addMore">
+		insert all 
+		<foreach collection="list" item="s">
+			into wxms_user(username,password,name,sex,phone,address,email,photo,role,createTime) values 
+			(#{s.username},#{s.password},#{s.name},#{s.sex},#{s.phone},#{s.address},#{s.email},#{s.photo},#{s.role},#{s.createTime}) 
+		</foreach>
+		select 1 from dual
+	</insert>
+	<update id="update" parameterType="User">
+		update wxms_user set
+		username = #{username},
+		password = #{password},
+		name = #{name},
+		sex = #{sex},
+		phone = #{phone},
+		address = #{address},
+		email = #{email},
+		photo = #{photo},
+		role = #{role},
+		createTime = sysdate
+		where id = #{id}
+	</update>
+	<select id="queryAll" resultType="User">
+		select * from wxms_user
+	</select>
+	<select id="queryByPage" parameterType="map" resultType="User">
+		select * from 
+		(select rownum rn, <include refid="fields"></include> from 
+		(select * from wxms_user) t
+		) a
+		where a.rn>=#{start} and a.rn&lt;=#{pageSize}
+	</select>
+	<select id="queryByPageCondition" parameterType="map" resultType="User">
+		select * from 
+		(select rownum rn, t.* from 
+		(select * from wxms_user)t
+		) a
+		where ${condition} and a.rn>=#{start} and a.rn&lt;=#{pageSize}
+	</select>
+	<select id="getTotals" resultType="int">
+		select count(*) from wxms_user
+	</select>
+	<select id="getTotalsCondition" resultType="int">
+		select count(*) from wxms_user #{condition}
+	</select>
+	<delete id="delete">
+		delete from wxms_user where id = #{id}
+	</delete>
+	<delete id="deleteMore">
+		delete from wxms_user where id in
+		<!-- collection:集合，separator:分隔符 -->
+		<foreach collection="array" open="(" close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</delete>
+	
+	
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PublicNumberFans">
+
+	
+	<!-- parameterType:参数类型,resultType:返回值类型, #{id}代表一个站位符 -->
+	<select id="queryById" parameterType="int" resultType="PublicNumberFans">
+		 select * from wxms_public_number_fans where id = #{id}
+	</select>
+	<insert id="add" parameterType="PublicNumberFans">
+		 insert into wxms_public_number_fans(,pid,addFans,reduceFans,countDate) 
+		 values (#{pid},#{addFans},#{reduceFans},#{countDate})
+	</insert>
+	<insert id="addMore">
+		insert all into  
+		<foreach collection="list" item="s">
+			wxms_public_number_fans(pid,addFans,reduceFans,countDate) values
+			(#{s.pid},#{s.addFans},#{s.reduceFans},#{s.countDate}) 
+		</foreach>
+		select 1 from dual
+	</insert>
+	<update id="update" parameterType="PublicNumberFans">
+		update wxms_public_number_fans set
+		pid = #{pid},
+		addFans = #{addFans},
+		reduceFans = #{reduceFans},
+		countDate = #{countDate}
+		where id = #{id}
+	</update>
+	<select id="queryAll" resultType="PublicNumberFans">
+		select * from wxms_public_number_fans
+	</select>
+	<select id="queryByPage" parameterType="map" resultType="PublicNumberFans">
+		select * from 
+		(select rownum rn, t.* from 
+		(select * from wxms_public_number_fans)t
+		) a
+		where a.rn>=#{start} and a.rn&lt;=#{pageSize}
+	</select>
+	<select id="queryByPageCondition" parameterType="map" resultType="PublicNumberFans">
+		select * from 
+		(select rownum rn, t.* from 
+		(select * from wxms_public_number_fans)t
+		) a
+		where ${condition} and a.rn>=#{start} and a.rn&lt;=#{pageSize} 
+	</select>
+	<select id="getTotals" resultType="int">
+		select count(*) from wxms_public_number_fans
+	</select>
+	<select id="getTotalsCondition" resultType="int">
+		select count(*) from wxms_public_number_fans #{condition}
+	</select>
+	<delete id="delete">
+		delete from wxms_public_number_fans where id = #{id}
+	</delete>
+	<delete id="deleteMore">
+		delete from wxms_public_number_fans where id in
+		<!-- collection:集合，separator:分隔符 -->
+		<foreach collection="array" open="(" close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</delete>
+	
+	
+</mapper>
